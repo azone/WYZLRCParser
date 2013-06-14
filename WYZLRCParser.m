@@ -12,10 +12,7 @@ NSTimeInterval convertStringToTimeInterval(NSString * timeIntervalString) {
     NSTimeInterval timeInterval = 0.0;
     NSArray * microSecondComponents = [timeIntervalString componentsSeparatedByString:@"."];
     NSArray * secondAndMinutesComponents = [microSecondComponents[0] componentsSeparatedByString:@":"];
-    NSTimeInterval microSecond = 0.0;
-    if ([microSecondComponents count] >= 2) {
-        microSecond = [microSecondComponents[1] doubleValue] * 0.001;
-    }
+    NSTimeInterval microSecond = [microSecondComponents[1] doubleValue] * 0.001;
     NSTimeInterval minute = [secondAndMinutesComponents[0] doubleValue];
     NSTimeInterval second = [secondAndMinutesComponents[1] doubleValue];
     
