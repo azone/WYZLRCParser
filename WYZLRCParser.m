@@ -12,14 +12,11 @@ NSTimeInterval convertStringToTimeInterval(NSString * timeIntervalString) {
     NSTimeInterval timeInterval = 0.0;
     NSArray * microSecondComponents = [timeIntervalString componentsSeparatedByString:@"."];
     NSArray * secondAndMinutesComponents = [microSecondComponents[0] componentsSeparatedByString:@":"];
-    NSTimeInterval microSecond = 0.0;
-    if ([microSecondComponents count] >= 2) {
-        microSecond = [microSecondComponents[1] doubleValue] * 0.001;
-    }
+    NSTimeInterval hundredthsOfSecond = [microSecondComponents[1] doubleValue] * 0.01;
     NSTimeInterval minute = [secondAndMinutesComponents[0] doubleValue];
     NSTimeInterval second = [secondAndMinutesComponents[1] doubleValue];
     
-    timeInterval = minute * 60 + second + microSecond;
+    timeInterval = minute * 60 + second + hundredthsOfSecond;
     
     return timeInterval;
 }
@@ -125,14 +122,14 @@ NSTimeInterval convertStringToTimeInterval(NSString * timeIntervalString) {
             scanner.scanLocation += 1;
             [scanner scanString:@"[" intoString:&scannedString];
         }
-     if (needToContinue) {
-         NSString * value = [line substringFromIndex:scanner.scanLocation+1];
-         value = value ?: @"";
-         [keys enumerateObjectsUsingBlock:^(NSString * timeline, NSUInteger idx, BOOL *stop) {
-             NSTimeInterval time = convertStringToTimeInterval(timeline);
-             [self.LRCDictionary setObject:value forKey:@(time)];
-         }];
-     }
+        if (needToContinue) {
+            NSString * value = [line substringFromIndex:scanner.scanLocation+1];
+            value = value ?: @"";
+            [keys enumerateObjectsUsingBlock:^(NSString * timeline, NSUInteger idx, BOOL *stop) {
+                NSTimeInterval time = convertStringToTimeInterval(timeline);
+                [self.LRCDictionary setObject:value forKey:@(time)];
+            }];
+        }
     }];
 }
 
