@@ -122,6 +122,7 @@ NSTimeInterval convertStringToTimeInterval(NSString * timeIntervalString) {
                 [keys addObject:key];
             }
             scannedString = nil;
+            scanner.scanLocation += 1;
             [scanner scanString:@"[" intoString:&scannedString];
         }
      if (needToContinue) {
