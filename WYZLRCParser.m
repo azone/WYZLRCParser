@@ -107,7 +107,7 @@ NSTimeInterval convertStringToTimeInterval(NSString * timeIntervalString) {
                 break;
             }
             else if ([key hasPrefix:@"offset:"]) {
-                self.offset = [[key substringFromIndex:7] floatValue];
+                self.offset = [[key substringFromIndex:7] floatValue] * 0.001;
                 break;
             }
             else if ([key hasPrefix:@"length:"]) {
