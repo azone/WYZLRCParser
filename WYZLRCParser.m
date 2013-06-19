@@ -12,7 +12,10 @@ NSTimeInterval convertStringToTimeInterval(NSString * timeIntervalString) {
     NSTimeInterval timeInterval = 0.0;
     NSArray * microSecondComponents = [timeIntervalString componentsSeparatedByString:@"."];
     NSArray * secondAndMinutesComponents = [microSecondComponents[0] componentsSeparatedByString:@":"];
-    NSTimeInterval microSecond = [microSecondComponents[1] doubleValue] * 0.001;
+    NSTimeInterval microSecond = 0.0;
+    if ([microSecondComponents count] >= 2) {
+        microSecond = [microSecondComponents[1] doubleValue] * 0.001;
+    }
     NSTimeInterval minute = [secondAndMinutesComponents[0] doubleValue];
     NSTimeInterval second = [secondAndMinutesComponents[1] doubleValue];
     
@@ -21,13 +24,19 @@ NSTimeInterval convertStringToTimeInterval(NSString * timeIntervalString) {
     return timeInterval;
 }
 
-@interface WYZLRCParser () {
-    NSString * _LRCString;
-}
+@interface WYZLRCParser ()
+
+@property (strong, nonatomic) NSString * file;
+@property (assign, nonatomic) NSStringEncoding encoding;
+@property (strong, readwrite, nonatomic) NSError * error;
 
 @end
 
 @implementation WYZLRCParser
+
+- (id)init {
+    return nil;
+}
 
 - (instancetype)initWithFile:(NSString *)file {
     return [self initWithFile:file encoding:NSUTF8StringEncoding];
@@ -36,16 +45,33 @@ NSTimeInterval convertStringToTimeInterval(NSString * timeIntervalString) {
 - (instancetype)initWithFile:(NSString *)file encoding:(NSStringEncoding)encoding {
     self = [super init];
     if (self) {
-        NSData * LRCData = [NSData dataWithContentsOfFile:file];
-        _LRCString = [[NSString alloc] initWithData:LRCData encoding:encoding];
+        self.file = file;
+        self.encoding = encoding;
         self.LRCDictionary = [NSMutableDictionary dictionary];
     }
     
     return self;
 }
 
++ (instancetype)parseWithFile:(NSString *)file {
+    return [self parseWithFile:file encoding:NSUTF8StringEncoding];
+}
+
++ (instancetype)parseWithFile:(NSString *)file encoding:(NSStringEncoding)encoding {
+    WYZLRCParser * LRCParser = [[self alloc] initWithFile:file encoding:NSUTF8StringEncoding];
+    [LRCParser parseLRC];
+    
+    return LRCParser;
+}
+
 - (void)parseLRC {
-    NSArray * lines = [_LRCString componentsSeparatedByString:@"\n"];
+    NSError * error;
+    NSString * LRCString = [NSString stringWithContentsOfFile:self.file encoding:self.encoding error:&error];
+    if (error) {
+        self.error = error;
+        return;
+    }
+    NSArray * lines = [LRCString componentsSeparatedByString:@"\n"];
     [lines enumerateObjectsUsingBlock:^(NSString * line, NSUInteger idx, BOOL *stop) {
         NSScanner * scanner = [NSScanner scannerWithString:line];
         NSString * scannedString;
@@ -53,10 +79,8 @@ NSTimeInterval convertStringToTimeInterval(NSString * timeIntervalString) {
         NSMutableArray *keys = [NSMutableArray array];
         BOOL needToContinue = NO;
         while (scannedString) {
-            NSUInteger start = scanner.scanLocation;
-            [scanner scanUpToString:@"]" intoString:nil];
-            NSUInteger end = scanner.scanLocation;
-            NSString * key = [line substringWithRange:NSMakeRange(start, end - start)];
+            NSString * key;
+            [scanner scanUpToString:@"]" intoString:&key];
             if ([key hasPrefix:@"ti:"]) {
                 self.title = [key substringFromIndex:3];
                 break;
@@ -105,7 +129,7 @@ NSTimeInterval convertStringToTimeInterval(NSString * timeIntervalString) {
          value = value ?: @"";
          [keys enumerateObjectsUsingBlock:^(NSString * timeline, NSUInteger idx, BOOL *stop) {
              NSTimeInterval time = convertStringToTimeInterval(timeline);
-             [self.LRCDictionary setObject:value forKey:@(time + self.offset)];
+             [self.LRCDictionary setObject:value forKey:@(time)];
          }];
      }
     }];

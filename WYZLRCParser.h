@@ -26,8 +26,13 @@
 
 @property (strong, nonatomic) NSMutableDictionary * LRCDictionary;
 
+@property (strong, readonly, nonatomic) NSError * error;
+
 - (instancetype)initWithFile:(NSString *)file;
 - (instancetype)initWithFile:(NSString *)file encoding:(NSStringEncoding)encoding;
+
++ (instancetype)parseWithFile:(NSString *)file;
++ (instancetype)parseWithFile:(NSString *)file encoding:(NSStringEncoding)encoding;
 
 - (void)parseLRC;
 
