@@ -123,7 +123,7 @@ NSTimeInterval convertStringToTimeInterval(NSString * timeIntervalString) {
             [scanner scanString:@"[" intoString:&scannedString];
         }
         if (needToContinue) {
-            NSString * value = [line substringFromIndex:scanner.scanLocation+1];
+            NSString * value = [line substringFromIndex:scanner.scanLocation];
             value = value ?: @"";
             [keys enumerateObjectsUsingBlock:^(NSString * timeline, NSUInteger idx, BOOL *stop) {
                 NSTimeInterval time = convertStringToTimeInterval(timeline);
