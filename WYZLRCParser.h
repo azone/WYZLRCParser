@@ -30,9 +30,11 @@
 
 - (instancetype)initWithFile:(NSString *)file;
 - (instancetype)initWithFile:(NSString *)file encoding:(NSStringEncoding)encoding;
+- (instancetype)initWithLRCString:(NSString *)LRCString;
 
 + (instancetype)parseWithFile:(NSString *)file;
 + (instancetype)parseWithFile:(NSString *)file encoding:(NSStringEncoding)encoding;
++ (instancetype)parseWithLRCString:(NSString *)LRCString;
 
 - (void)parseLRC;
 

@@ -23,9 +23,9 @@ NSTimeInterval convertStringToTimeInterval(NSString * timeIntervalString) {
 
 @interface WYZLRCParser ()
 
-@property (strong, nonatomic) NSString * file;
 @property (assign, nonatomic) NSStringEncoding encoding;
 @property (strong, readwrite, nonatomic) NSError * error;
+@property (copy, nonatomic) NSString *LRCString;
 
 @end
 
@@ -40,13 +40,16 @@ NSTimeInterval convertStringToTimeInterval(NSString * timeIntervalString) {
 }
 
 - (instancetype)initWithFile:(NSString *)file encoding:(NSStringEncoding)encoding {
+        NSString *LRCString = [NSString stringWithContentsOfFile:file encoding:self.encoding error:&error];        self.encoding = encoding;
+    return [self initWithLRCString:LRCString];
+}
+
+- (instancetype)initWithLRCString:(NSString *)LRCString {
     self = [super init];
     if (self) {
-        self.file = file;
-        self.encoding = encoding;
-        self.LRCDictionary = [NSMutableDictionary dictionary];
+        _LRCString = LRCString;
+        _LRCDictionary = [NSMutableDictionary dictionary];
     }
-    
     return self;
 }
 
@@ -61,14 +64,20 @@ NSTimeInterval convertStringToTimeInterval(NSString * timeIntervalString) {
     return LRCParser;
 }
 
++ (instancetype)parseWithLRCString:(NSString *)LRCString {
+    WYZLRCParser * LRCParser = [[self alloc] initWithLRCString:LRCString];
+    [LRCParser parseLRC];
+    
+    return LRCParser;
+}
+
 - (void)parseLRC {
     NSError * error;
-    NSString * LRCString = [NSString stringWithContentsOfFile:self.file encoding:self.encoding error:&error];
     if (error) {
         self.error = error;
         return;
     }
-    NSArray * lines = [LRCString componentsSeparatedByString:@"\n"];
+    NSArray * lines = [self.LRCString componentsSeparatedByString:@"\n"];
     [lines enumerateObjectsUsingBlock:^(NSString * line, NSUInteger idx, BOOL *stop) {
         NSScanner * scanner = [NSScanner scannerWithString:line];
         NSString * scannedString;
