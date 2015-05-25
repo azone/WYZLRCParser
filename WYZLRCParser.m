@@ -11,10 +11,16 @@
 NSTimeInterval convertStringToTimeInterval(NSString * timeIntervalString) {
     NSTimeInterval timeInterval = 0.0;
     NSArray * microSecondComponents = [timeIntervalString componentsSeparatedByString:@"."];
-    NSArray * secondAndMinutesComponents = [microSecondComponents[0] componentsSeparatedByString:@":"];
-    NSTimeInterval hundredthsOfSecond = [microSecondComponents[1] doubleValue] * 0.01;
-    NSTimeInterval minute = [secondAndMinutesComponents[0] doubleValue];
-    NSTimeInterval second = [secondAndMinutesComponents[1] doubleValue];
+    NSArray * secondAndMinutesComponents = [[microSecondComponents firstObject] componentsSeparatedByString:@":"];
+    NSTimeInterval hundredthsOfSecond = 0;
+    if(microSecondComponents.count >= 2){
+        hundredthsOfSecond = [microSecondComponents[1] doubleValue] * 0.01;
+    }
+    NSTimeInterval minute = [[secondAndMinutesComponents firstObject] doubleValue];
+    NSTimeInterval second = 0;
+    if(secondAndMinutesComponents.count >= 2){
+        second = [secondAndMinutesComponents[1] doubleValue];
+    }
     
     timeInterval = minute * 60 + second + hundredthsOfSecond;
     
@@ -40,6 +46,7 @@ NSTimeInterval convertStringToTimeInterval(NSString * timeIntervalString) {
 }
 
 - (instancetype)initWithFile:(NSString *)file encoding:(NSStringEncoding)encoding {
+    NSError* error = nil;
         NSString *LRCString = [NSString stringWithContentsOfFile:file encoding:self.encoding error:&error];        self.encoding = encoding;
     return [self initWithLRCString:LRCString];
 }
@@ -77,7 +84,10 @@ NSTimeInterval convertStringToTimeInterval(NSString * timeIntervalString) {
         self.error = error;
         return;
     }
-    NSArray * lines = [self.LRCString componentsSeparatedByString:@"\n"];
+    NSArray * lines = [self.LRCString componentsSeparatedByString:@"\r\n"];
+    if(lines.count <= 1){
+        lines = [self.LRCString componentsSeparatedByString:@"\n"];
+    }
     [lines enumerateObjectsUsingBlock:^(NSString * line, NSUInteger idx, BOOL *stop) {
         NSScanner * scanner = [NSScanner scannerWithString:line];
         NSString * scannedString;
