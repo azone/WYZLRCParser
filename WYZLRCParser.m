@@ -84,10 +84,8 @@ NSTimeInterval convertStringToTimeInterval(NSString * timeIntervalString) {
         self.error = error;
         return;
     }
-    NSArray * lines = [self.LRCString componentsSeparatedByString:@"\r\n"];
-    if(lines.count <= 1){
-        lines = [self.LRCString componentsSeparatedByString:@"\n"];
-    }
+    NSString* fliterString = [self.LRCString stringByReplacingOccurrencesOfString:@"\r" withString:@""];
+    NSArray * lines = [fliterString componentsSeparatedByString:@"\n"];
     [lines enumerateObjectsUsingBlock:^(NSString * line, NSUInteger idx, BOOL *stop) {
         NSScanner * scanner = [NSScanner scannerWithString:line];
         NSString * scannedString;
