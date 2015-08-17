@@ -10,19 +10,14 @@
 
 NSTimeInterval convertStringToTimeInterval(NSString * timeIntervalString) {
     NSTimeInterval timeInterval = 0.0;
-    NSArray * microSecondComponents = [timeIntervalString componentsSeparatedByString:@"."];
-    NSArray * secondAndMinutesComponents = [[microSecondComponents firstObject] componentsSeparatedByString:@":"];
-    NSTimeInterval hundredthsOfSecond = 0;
-    if(microSecondComponents.count >= 2){
-        hundredthsOfSecond = [microSecondComponents[1] doubleValue] * 0.01;
-    }
+    NSArray * secondAndMinutesComponents = [timeIntervalString componentsSeparatedByString:@":"];
     NSTimeInterval minute = [[secondAndMinutesComponents firstObject] doubleValue];
     NSTimeInterval second = 0;
     if(secondAndMinutesComponents.count >= 2){
         second = [secondAndMinutesComponents[1] doubleValue];
     }
     
-    timeInterval = minute * 60 + second + hundredthsOfSecond;
+    timeInterval = minute * 60 + second;
     
     return timeInterval;
 }
@@ -84,6 +79,7 @@ NSTimeInterval convertStringToTimeInterval(NSString * timeIntervalString) {
         self.error = error;
         return;
     }
+    
     NSString* fliterString = [self.LRCString stringByReplacingOccurrencesOfString:@"\r" withString:@""];
     NSArray * lines = [fliterString componentsSeparatedByString:@"\n"];
     [lines enumerateObjectsUsingBlock:^(NSString * line, NSUInteger idx, BOOL *stop) {
