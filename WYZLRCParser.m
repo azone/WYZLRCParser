@@ -42,7 +42,8 @@ NSTimeInterval convertStringToTimeInterval(NSString * timeIntervalString) {
 
 - (instancetype)initWithFile:(NSString *)file encoding:(NSStringEncoding)encoding {
     NSError* error = nil;
-        NSString *LRCString = [NSString stringWithContentsOfFile:file encoding:self.encoding error:&error];        self.encoding = encoding;
+    NSString *LRCString = [NSString stringWithContentsOfFile:file encoding:self.encoding error:&error];
+    self.encoding = encoding;
     return [self initWithLRCString:LRCString];
 }
 
