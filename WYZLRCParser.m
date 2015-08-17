@@ -10,13 +10,14 @@
 
 NSTimeInterval convertStringToTimeInterval(NSString * timeIntervalString) {
     NSTimeInterval timeInterval = 0.0;
-    NSArray * microSecondComponents = [timeIntervalString componentsSeparatedByString:@"."];
-    NSArray * secondAndMinutesComponents = [microSecondComponents[0] componentsSeparatedByString:@":"];
-    NSTimeInterval hundredthsOfSecond = [microSecondComponents[1] doubleValue] * 0.01;
-    NSTimeInterval minute = [secondAndMinutesComponents[0] doubleValue];
-    NSTimeInterval second = [secondAndMinutesComponents[1] doubleValue];
+    NSArray * secondAndMinutesComponents = [timeIntervalString componentsSeparatedByString:@":"];
+    NSTimeInterval minute = [[secondAndMinutesComponents firstObject] doubleValue];
+    NSTimeInterval second = 0;
+    if(secondAndMinutesComponents.count >= 2){
+        second = [secondAndMinutesComponents[1] doubleValue];
+    }
     
-    timeInterval = minute * 60 + second + hundredthsOfSecond;
+    timeInterval = minute * 60 + second;
     
     return timeInterval;
 }
@@ -40,6 +41,7 @@ NSTimeInterval convertStringToTimeInterval(NSString * timeIntervalString) {
 }
 
 - (instancetype)initWithFile:(NSString *)file encoding:(NSStringEncoding)encoding {
+    NSError* error = nil;
         NSString *LRCString = [NSString stringWithContentsOfFile:file encoding:self.encoding error:&error];        self.encoding = encoding;
     return [self initWithLRCString:LRCString];
 }
@@ -77,7 +79,9 @@ NSTimeInterval convertStringToTimeInterval(NSString * timeIntervalString) {
         self.error = error;
         return;
     }
-    NSArray * lines = [self.LRCString componentsSeparatedByString:@"\n"];
+    
+    NSString* fliterString = [self.LRCString stringByReplacingOccurrencesOfString:@"\r" withString:@""];
+    NSArray * lines = [fliterString componentsSeparatedByString:@"\n"];
     [lines enumerateObjectsUsingBlock:^(NSString * line, NSUInteger idx, BOOL *stop) {
         NSScanner * scanner = [NSScanner scannerWithString:line];
         NSString * scannedString;
