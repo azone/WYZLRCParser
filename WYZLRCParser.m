@@ -92,7 +92,12 @@ NSTimeInterval convertStringToTimeInterval(NSString * timeIntervalString) {
         while (scannedString) {
             NSString * key;
             [scanner scanUpToString:@"]" intoString:&key];
-            if ([key hasPrefix:@"ti:"]) {
+            
+            // 没有找到 ']'
+            if(scanner.scanLocation >= line.length){
+                break;
+            }
+            else if ([key hasPrefix:@"ti:"]) {
                 self.title = [key substringFromIndex:3];
                 break;
             }
