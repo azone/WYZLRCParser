@@ -88,55 +88,65 @@ NSTimeInterval convertStringToTimeInterval(NSString * timeIntervalString) {
         NSString * scannedString;
         [scanner scanString:@"[" intoString:&scannedString];
         NSMutableArray *keys = [NSMutableArray array];
-        BOOL needToContinue = NO;
+        
         while (scannedString) {
             NSString * key;
             [scanner scanUpToString:@"]" intoString:&key];
-            if ([key hasPrefix:@"ti:"]) {
-                self.title = [key substringFromIndex:3];
+            
+            // 没有找到 ']'
+            if(scanner.scanLocation >= line.length){
                 break;
             }
-            else if ([key hasPrefix:@"ar:"]) {
-                self.artist = [key substringFromIndex:3];
-                break;
+            // 确保 key 不为空
+            if (key) {
+                if ([key hasPrefix:@"ti:"]) {
+                    self.title = [key substringFromIndex:3];
+                    break;
+                }
+                else if ([key hasPrefix:@"ar:"]) {
+                    self.artist = [key substringFromIndex:3];
+                    break;
+                }
+                else if ([key hasPrefix:@"al:"]) {
+                    self.album = [key substringFromIndex:3];
+                    break;
+                }
+                else if ([key hasPrefix:@"au:"]) {
+                    self.lyricist = [key substringFromIndex:3];
+                    break;
+                }
+                else if ([key hasPrefix:@"by:"]) {
+                    self.createAuthor = [key substringFromIndex:3];
+                    break;
+                }
+                else if ([key hasPrefix:@"re:"]) {
+                    self.createTool = [key substringFromIndex:3];
+                    break;
+                }
+                else if ([key hasPrefix:@"ve:"]) {
+                    self.createToolVersion = [key substringFromIndex:3];
+                    break;
+                }
+                else if ([key hasPrefix:@"offset:"]) {
+                    self.offset = [[key substringFromIndex:7] floatValue] * 0.001;
+                    break;
+                }
+                else if ([key hasPrefix:@"length:"]) {
+                    self.length = convertStringToTimeInterval([key substringFromIndex:7]);
+                    break;
+                }
+                else {
+                    [keys addObject:key];
+                }
             }
-            else if ([key hasPrefix:@"al:"]) {
-                self.album = [key substringFromIndex:3];
-                break;
-            }
-            else if ([key hasPrefix:@"au:"]) {
-                self.lyricist = [key substringFromIndex:3];
-                break;
-            }
-            else if ([key hasPrefix:@"by:"]) {
-                self.createAuthor = [key substringFromIndex:3];
-                break;
-            }
-            else if ([key hasPrefix:@"re:"]) {
-                self.createTool = [key substringFromIndex:3];
-                break;
-            }
-            else if ([key hasPrefix:@"ve:"]) {
-                self.createToolVersion = [key substringFromIndex:3];
-                break;
-            }
-            else if ([key hasPrefix:@"offset:"]) {
-                self.offset = [[key substringFromIndex:7] floatValue] * 0.001;
-                break;
-            }
-            else if ([key hasPrefix:@"length:"]) {
-                self.length = convertStringToTimeInterval([key substringFromIndex:7]);
-                break;
-            }
-            else {
-                needToContinue = YES;
-                [keys addObject:key];
-            }
+            
             scannedString = nil;
             scanner.scanLocation += 1;
             [scanner scanString:@"[" intoString:&scannedString];
         }
-        if (needToContinue) {
+        
+        // 寻找到了 时间key，接着寻找后边真的的歌词
+        if (keys.count > 0) {
             NSString * value = [line substringFromIndex:scanner.scanLocation];
             value = value ?: @"";
             [keys enumerateObjectsUsingBlock:^(NSString * timeline, NSUInteger idx, BOOL *stop) {
