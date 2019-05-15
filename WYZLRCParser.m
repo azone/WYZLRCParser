@@ -1,6 +1,5 @@
 //
 //  WYZLRCParser.m
-//  Long Weibo Sharing
 //
 //  Created by Yozone Wang on 13-6-1.
 //  Copyright (c) 2013年 Yozone Wang. All rights reserved.
